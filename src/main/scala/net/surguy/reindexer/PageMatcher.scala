@@ -4,6 +4,8 @@ package net.surguy.reindexer
   * Identify the matching pages.
   */
 class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
+  private val CONTEXT_SIZE_IN_WORDS = 5
+  private val MAX_DISTANCE_FROM_ORIGINAL_PAGE = 4
 
   def findNewIndex(indexTerm: String, originalPageNumber: Int): Option[Int] = {
     val originalPage = oldVersion.find(_.pageNumber == originalPageNumber)
@@ -15,10 +17,11 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   }
 
   /** Return the words in the page close to the original term, for example the full sentence it appears in */
-  private[reindexer] def findContext(term: String, pageText: String): List[String] = {
-    // @todo Do we want to pas in the previous and next page, because the sentence may be split across pages?
-    val position = pageText.toLowerCase.indexOf(term.toLowerCase)
-    ???
+  private[reindexer] def findContext(term: String, pageText: String, contextSize: Int = CONTEXT_SIZE_IN_WORDS): List[String] = {
+    import WordUtils.StringWithBreaks
+    val words = pageText.words.toList
+    val position: Int = words.indexWhere(word => word.toLowerCase()==term.toLowerCase)
+    words.slice(position - contextSize, position + contextSize + 1)
   }
 
   /** Find the page that a term is on. */
@@ -28,7 +31,7 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   }
 
   /** Return a list of the pages to check, in order of likelihood - for example 6, 7, 5, 8, 4 if the term was on page 6 originally. */
-  private[reindexer] def identifyPagesToCheck(startSearchAt: Int, pageCount: Int, maxDistance: Int = 4): Seq[Int] = {
+  private[reindexer] def identifyPagesToCheck(startSearchAt: Int, pageCount: Int, maxDistance: Int = MAX_DISTANCE_FROM_ORIGINAL_PAGE): Seq[Int] = {
     val ascending = startSearchAt to Math.min(startSearchAt + maxDistance, pageCount)
     val descending = (startSearchAt - 1).to(1, -1)
     ascending.zipAll(descending,0,0).flatMap { case (a, b) => Seq(a, b) }.filter(_ > 0)
