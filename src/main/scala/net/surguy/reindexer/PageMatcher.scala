@@ -32,7 +32,7 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   /** Find the page that a term is on. */
   private[reindexer] def findMatchingPage(indexTerm: String, context: Context, startSearchAt: Int, pages: List[Page]): Option[Int] = {
     val pagesToCheck: Seq[Int] = identifyPagesToCheck(startSearchAt, pages.length)
-    pagesToCheck.find(i => checkPage(pages(i).contents, indexTerm, context).isDefined )
+    pagesToCheck.find(i => checkPage(pages.find(_.pageNumber==i).get.contents, indexTerm, context).isDefined )
   }
 
   /** Return a list of the pages to check, in order of likelihood - for example 6, 7, 5, 8, 4 if the term was on page 6 originally. */
