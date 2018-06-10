@@ -11,6 +11,7 @@ class IndexReaderSpec extends Specification {
     "convert a single simple number" in { readLine("fish, 53") mustEqual IndexEntry("fish", Seq(53)) }
     "convert multiple simple numbers" in { readLine("cat, 53, 67, 89") mustEqual IndexEntry("cat", Seq(53, 67, 89)) }
     "convert multiple complex numbers" in { readLine("dog, 12, 15-7, 89-90") mustEqual IndexEntry("dog", Seq(12, 15, 16, 17, 89, 90)) }
+    "convert terms containing commas" in { readLine("cats, colours of, 16–19, 12") mustEqual IndexEntry("colours of cats", Seq(16, 17, 18, 19, 12)) }
   }
 
   "converting page references" should {
