@@ -24,6 +24,7 @@ class PageMatcherSpec extends Specification {
     "ignore punctuation" in { findContext("dog", text, 3) mustEqual split("over the lazy dog It sings the") }
     "stop at the beginning of a page" in { findContext("quick", text, 3) mustEqual split("The quick brown fox jumps") }
     "stop at the end of a page" in { findContext("Om", text, 3) mustEqual split("the tasty hens Om nom") }
+    "work for multiword terms" in { findContext("lazy dog", text, contextSize = 3) mustEqual split("fox jumps over the lazy dog It sings the")  }
   }
 
   "finding matches" should {
@@ -40,6 +41,12 @@ class PageMatcherSpec extends Specification {
     "ignore hyphens in the text" in { checkPage("Tasty fish-cakes", "fishcakes", split("Tasty fish-cakes")) must beSome }
     "ignore hyphens in the term" in { checkPage("Tasty fishcakes", "fish-cakes", split("Tasty fishcakes")) must beSome }
     "match hyphens if in both" in { checkPage("Tasty fish-cakes", "fish-cakes", split("Tasty fish-cakes")) must beSome }
+  }
+
+  "finding multiword matches" should {
+    import pageMatcher.checkPage
+    "find an exact multiword match" in { checkPage("The quick brown fox jumps the dog", "brown fox", split("The quick brown fox jumps the dog")) must beSome }
+    "not find a wrong match" in { checkPage("The quick brown fox jumps the dog", "red fox", split("The quick red fox jumps the dog")) must beNone }
   }
 
   private def split(s: String) = s.split(" ").toList

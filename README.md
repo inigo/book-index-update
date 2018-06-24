@@ -43,7 +43,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 larger boundaries - spidergrams - DONE
 Synonyms - accuracy -> precise, if 
-multiple word phrases - lots
+multiple word phrases - lots - DONE
 repeating text - photographs
 reduce thresholds if no match - planning pg 38 (or recognize headings)
 ignore hyphens - proofreading/proof-reading - DONE

@@ -1,5 +1,7 @@
 package net.surguy.reindexer
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * Identify the matching pages.
   */
@@ -22,9 +24,10 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   /** Return the words in the page close to the original term, for example the full sentence it appears in */
   private[reindexer] def findContext(term: String, pageText: String, contextSize: Int = CONTEXT_SIZE_IN_WORDS): Context = {
     import WordUtils.StringWithBreaks
+    val sanitizedTerms = term.words.map(sanitize).toList
     val words = pageText.words.toList
-    val position: Int = words.indexWhere(_.toLowerCase==term.toLowerCase)
-    nearbyWords(words, position, contextSize)
+    val position: Int =  words.map(sanitize).indexOfSlice(sanitizedTerms)
+    nearbyWords(words, position, contextSize + (sanitizedTerms.length-1))
   }
 
   private def nearbyWords(words: List[String], position: Int, contextSize: Int): Context = words.slice(position - contextSize, position + contextSize + 1)
@@ -47,15 +50,27 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
     import WordUtils.StringWithBreaks
     val sanitizedContext = context.map(sanitize)
     val words = contents.words.toList.map(sanitize)
-    val sanitizedTerm = sanitize(indexTerm)
+    val sanitizedTerms = sanitize(indexTerm).words.toList
 
-    val potentialMatchIndices = words.zipWithIndex.filter(_._1 == sanitizedTerm).map(_._2)
+    val potentialMatchIndices = allIndexesOfTerms(sanitizedTerms, words)
     val potentialContexts: Seq[Context] = potentialMatchIndices.map(i => nearbyWords(words, i, contextSize))
     val foundMatch: Option[Context] = potentialContexts.find(pc => isCloseMatch(sanitizedContext, pc))
     foundMatch
   }
 
-  private def sanitize(s: String) = s.toLowerCase.replaceAll("[^A-Za-z0-9]","")
+  private def allIndexesOfTerms(term: Seq[String], pageContent: Seq[String]): Seq[Int] = {
+    val indices = ListBuffer[Int]()
+    var startPosition = 0
+    var lastFind = pageContent.indexOfSlice(term, startPosition)
+    while (lastFind != -1 ) {
+      indices.append(lastFind)
+      startPosition = lastFind
+      lastFind = pageContent.indexOfSlice(term, startPosition+1)
+    }
+    indices.toList
+  }
+
+  private def sanitize(s: String) = s.toLowerCase.replaceAll("[^A-Za-z0-9 ]","")
 
   private def isCloseMatch(first: Context, second: Context):Boolean = {
     val totalWords = Math.min(first.length, second.length)

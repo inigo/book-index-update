@@ -20,7 +20,7 @@ class IndexUpdaterIntegrationTest extends Specification {
 
       val matches = newIndex.map(ie => ie.pages.count(_ != -1) ).sum
       println("Matches are "+matches)
-      matches must beGreaterThanOrEqualTo(138) // Increase this as we get more matches
+      matches must beGreaterThanOrEqualTo(207) // Increase this as we get more matches
     }
   }
 
