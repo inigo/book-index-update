@@ -5,7 +5,7 @@ package net.surguy.reindexer
   */
 class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   private val CONTEXT_SIZE_IN_WORDS = 5
-  private val MAX_DISTANCE_FROM_ORIGINAL_PAGE = 4
+  private val MAX_DISTANCE_FROM_ORIGINAL_PAGE = 30
   private val CONTEXT_MATCH_THRESHOLD = 0.7
 
   type Context = List[String]

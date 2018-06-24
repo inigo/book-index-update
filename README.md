@@ -38,3 +38,12 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+## Improvements
+
+larger boundaries - spidergrams - DONE
+Synonyms - accuracy -> precise, if 
+multiple word phrases - lots
+repeating text - photographs
+reduce thresholds if no match - planning pg 38 (or recognize headings)
+ignore hyphens - proofreading/proof-reading
