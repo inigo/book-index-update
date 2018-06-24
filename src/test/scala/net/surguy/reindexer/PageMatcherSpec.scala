@@ -37,6 +37,9 @@ class PageMatcherSpec extends Specification {
     "reject a match with changed context" in { checkPage(text, "jumps", split("my shiny horse jumps the fence regularly")) must beNone }
     "find the first match if context is correct" in { checkPage(text, "fox", split("The quick brown fox jumps over the")) must beSome }
     "find the second match if context is correct" in { checkPage(text, "fox", split("chickens then the fox eats all the tasty")) must beSome }
+    "ignore hyphens in the text" in { checkPage("Tasty fish-cakes", "fishcakes", split("Tasty fish-cakes")) must beSome }
+    "ignore hyphens in the term" in { checkPage("Tasty fishcakes", "fish-cakes", split("Tasty fishcakes")) must beSome }
+    "match hyphens if in both" in { checkPage("Tasty fish-cakes", "fish-cakes", split("Tasty fish-cakes")) must beSome }
   }
 
   private def split(s: String) = s.split(" ").toList

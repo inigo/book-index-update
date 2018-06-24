@@ -15,8 +15,12 @@ class IndexUpdaterIntegrationTest extends Specification {
 
   "converting a book" should {
     "produce an updated index" in {
-      val newIndex = new IndexUpdater().updateIndex(oldFile, -10, newFile, -10, indexFile)
+      val newIndex: Seq[IndexEntry] = new IndexUpdater().updateIndex(oldFile, -10, newFile, -10, indexFile)
       newIndex must haveLength(greaterThan(10))
+
+      val matches = newIndex.map(ie => ie.pages.count(_ != -1) ).sum
+      println("Matches are "+matches)
+      matches must beGreaterThanOrEqualTo(138) // Increase this as we get more matches
     }
   }
 

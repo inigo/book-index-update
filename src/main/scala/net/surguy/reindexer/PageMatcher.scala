@@ -45,14 +45,17 @@ class PageMatcher(oldVersion: List[Page], newVersion: List[Page]) {
   /** Identify if a term is on a page, with a close-enough match for the surrounding context.  */
   private[reindexer] def checkPage(contents: String, indexTerm: String, context: Context, contextSize: Int = CONTEXT_SIZE_IN_WORDS): Option[List[String]] = {
     import WordUtils.StringWithBreaks
-    val sanitizedContext = context.map(_.toLowerCase.replaceAll("[^A-Za-z0-9]",""))
-    val words = contents.words.toList.map(_.toLowerCase)
+    val sanitizedContext = context.map(sanitize)
+    val words = contents.words.toList.map(sanitize)
+    val sanitizedTerm = sanitize(indexTerm)
 
-    val potentialMatchIndices = words.zipWithIndex.filter(_._1 == indexTerm.toLowerCase).map(_._2)
+    val potentialMatchIndices = words.zipWithIndex.filter(_._1 == sanitizedTerm).map(_._2)
     val potentialContexts: Seq[Context] = potentialMatchIndices.map(i => nearbyWords(words, i, contextSize))
     val foundMatch: Option[Context] = potentialContexts.find(pc => isCloseMatch(sanitizedContext, pc))
     foundMatch
   }
+
+  private def sanitize(s: String) = s.toLowerCase.replaceAll("[^A-Za-z0-9]","")
 
   private def isCloseMatch(first: Context, second: Context):Boolean = {
     val totalWords = Math.min(first.length, second.length)
